@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập 2: Quản Lý Công Việc & Tra Cứu Lệnh Git - Nguyễn Thế Nhật</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #090d16;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --success-color: #10b981;
+            --font-main: 'Outfit', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 920px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Top Header Navigation */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Checklist Card */
+        .section-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.75rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.85rem 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #3b82f6;
+            cursor: pointer;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Add Task Form */
+        .add-task-box {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .input-task {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-main);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .input-task:focus {
+            border-color: #3b82f6;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        /* Git Command Cheat Sheet */
+        .cheat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .cheat-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cheat-code {
+            font-family: var(--font-code);
+            color: #38bdf8;
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-muted);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .btn-copy:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .cheat-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Navigation Header -->
+        <nav class="nav-bar">
+            <div class="nav-brand">📌 Bài Tập 2 - Nguyễn Thế Nhật</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">👈 Bài 1 (Dashboard)</a>
+                <a href="index2.html" class="nav-link active">Bài 2 (Task Tracker & Cheat Sheet)</a>
+            </div>
+        </nav>
+
+        <!-- Interactive Task Tracker -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">✅ Danh Sách Tiến Độ Thực Hành Git & Linux</h2>
+                <span style="color: var(--text-muted); font-size: 0.85rem;" id="progressText">Đã hoàn thành 3/4 công việc</span>
+            </div>
+
+            <div class="task-list" id="taskList">
+                <div class="task-item completed">
+                    <div class="task-left">
+                        <input type="checkbox" class="task-checkbox" checked onchange="toggleTask(this)">
+                        <span class="task-text">Cài đặt Ubuntu 24.04 LTS trên VirtualBox</span>
+                    </div>
+                    <span class="task-tag">Môi trường</span>
+                </div>
+
+                <div class="task-item completed">
+                    <div class="task-left">
+                        <input type="checkbox" class="task-checkbox" checked onchange="toggleTask(this)">
+                        <span class="task-text">Cấu hình Git Email & Username đồng bộ 2 máy</span>
+                    </div>
+                    <span class="task-tag">Git Config</span>
+                </div>
+
+                <div class="task-item completed">
+                    <div class="task-left">
+                        <input type="checkbox" class="task-checkbox" checked onchange="toggleTask(this)">
+                        <span class="task-text">Tạo bài tập index.html & đẩy lên GitHub</span>
+                    </div>
+                    <span class="task-tag">GitHub</span>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-left">
+                        <input type="checkbox" class="task-checkbox" onchange="toggleTask(this)">
+                        <span class="task-text">Đẩy tiếp bài tập ví dụ index2.html lên GitHub</span>
+                    </div>
+                    <span class="task-tag">Đang làm</span>
+                </div>
+            </div>
+
+            <div class="add-task-box">
+                <input type="text" id="newTaskInput" class="input-task" placeholder="Thêm công việc thực hành mới...">
+                <button class="btn-primary" onclick="addTask()">Thêm việc</button>
+            </div>
+        </section>
+
+        <!-- Git Cheat Sheet Section -->
+        <section class="section-card">
+            <h2 class="section-title" style="margin-bottom: 1rem;">📚 Bảng Tra Cứu Nhanh Lệnh Git Thông Dụng</h2>
+
+            <div class="cheat-grid">
+                <div class="cheat-card">
+                    <div class="cheat-code">
+                        <span>git status</span>
+                        <button class="btn-copy" onclick="copyText('git status')">Copy</button>
+                    </div>
+                    <div class="cheat-desc">Kiểm tra trạng thái các tệp tin đã sửa, đã thêm hoặc chưa theo dõi.</div>
+                </div>
+
+                <div class="cheat-card">
+                    <div class="cheat-code">
+                        <span>git pull origin main</span>
+                        <button class="btn-copy" onclick="copyText('git pull origin main')">Copy</button>
+                    </div>
+                    <div class="cheat-desc">Cập nhật những thay đổi mới nhất từ kho chứa trên GitHub về máy.</div>
+                </div>
+
+                <div class="cheat-card">
+                    <div class="cheat-code">
+                        <span>git add .</span>
+                        <button class="btn-copy" onclick="copyText('git add .')">Copy</button>
+                    </div>
+                    <div class="cheat-desc">Đưa toàn bộ các tệp tin đã chỉnh sửa vào khu vực hàng chờ (Staging).</div>
+                </div>
+
+                <div class="cheat-card">
+                    <div class="cheat-code">
+                        <span>git commit -m "nội dung"</span>
+                        <button class="btn-copy" onclick="copyText('git commit -m &quot;nội dung&quot;')">Copy</button>
+                    </div>
+                    <div class="cheat-desc">Tạo bản snapshot lưu trữ trạng thái kèm dòng mô tả ngắn gọn.</div>
+                </div>
+
+                <div class="cheat-card">
+                    <div class="cheat-code">
+                        <span>git push origin main</span>
+                        <button class="btn-copy" onclick="copyText('git push origin main')">Copy</button>
+                    </div>
+                    <div class="cheat-desc">Đẩy tất cả các commit từ máy cá nhân lên kho lưu trữ GitHub.</div>
+                </div>
+
+                <div class="cheat-card">
+                    <div class="cheat-code">
+                        <span>git log --oneline</span>
+                        <button class="btn-copy" onclick="copyText('git log --oneline')">Copy</button>
+                    </div>
+                    <div class="cheat-desc">Xem lịch sử các lần commit rút gọn chỉ trên 1 dòng đơn giản.</div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 Nguyễn Thế Nhật • Thực hành Git & Linux • Bài Tập 2 (index2.html)</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleTask(checkbox) {
+            const item = checkbox.closest('.task-item');
+            if (checkbox.checked) {
+                item.classList.add('completed');
+            } else {
+                item.classList.remove('completed');
+            }
+            updateProgress();
+        }
+
+        function addTask() {
+            const input = document.getElementById('newTaskInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const taskList = document.getElementById('taskList');
+            const newItem = document.createElement('div');
+            newItem.className = 'task-item';
+            newItem.innerHTML = `
+                <div class="task-left">
+                    <input type="checkbox" class="task-checkbox" onchange="toggleTask(this)">
+                    <span class="task-text">${text}</span>
+                </div>
+                <span class="task-tag">Mới</span>
+            `;
+            taskList.appendChild(newItem);
+            input.value = '';
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = document.querySelectorAll('.task-checkbox').length;
+            const completed = document.querySelectorAll('.task-checkbox:checked').length;
+            document.getElementById('progressText').innerText = `Đã hoàn thành ${completed}/${total} công việc`;
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            alert('Đã sao chép: ' + text);
+        }
+    </script>
+</body>
+</html>
