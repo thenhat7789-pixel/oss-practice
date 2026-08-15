@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Phep Tinh Nhan Chia</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; background: #f0f2f5; text-align: center; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
+        h2 { color: #1e3a8a; }
+        .btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .result { font-size: 20px; font-weight: bold; margin-top: 20px; color: #10b981; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Phep Tinh Nhan Chia tu VM</h2>
+        <p>So thu nhat: <strong>9</strong></p>
+        <p>So thu hai: <strong>8</strong></p>
+        <button class="btn" onclick="tinh()">Thuc Hien Phep Tinh</button>
+        <div id="kq" class="result"></div>
+    </div>
+    <script>
+        function tinh() {
+            let n = 9 * 8;
+            let c = 72 / 8;
+            document.getElementById('kq').innerHTML = 'Phep Nhan: 9 x 8 = ' + n + '<br>Phep Chia: 72 / 8 = ' + c;
+        }
+    </script>
+</body>
+</html>
