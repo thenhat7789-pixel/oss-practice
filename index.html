@@ -2,10 +2,484 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hello The Nhat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ Sơ Thực Hành & Git Dashboard - Nguyễn Thế Nhật</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --accent-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #db2777 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --font-main: 'Outfit', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Profile Header */
+        header.profile-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .avatar-box {
+            position: relative;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .online-status {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background-color: var(--success-color);
+            border: 3px solid var(--bg-secondary);
+            border-radius: 50%;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Git Command Interactive Helper */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .cmd-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .cmd-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 12px 20px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .cmd-card.active {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .cmd-step {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .cmd-name {
+            font-family: var(--font-code);
+            font-weight: 600;
+            color: #38bdf8;
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .cmd-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Terminal Preview Container */
+        .terminal-box {
+            background: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .terminal-header {
+            background: #0f172a;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+
+        .terminal-title {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .terminal-body {
+            padding: 1.25rem;
+            font-family: var(--font-code);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            min-height: 140px;
+        }
+
+        .prompt {
+            color: #10b981;
+        }
+
+        .cmd-text {
+            color: #f43f5e;
+            font-weight: 600;
+        }
+
+        .output-text {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            white-space: pre-wrap;
+        }
+
+        /* Interactive Quiz */
+        .quiz-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.75rem;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            margin-top: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .quiz-option.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--success-color);
+            color: #6ee7b7;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .btn-action {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        footer {
+            margin-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            header.profile-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+            .badges {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Xin chao! Day la bai tap dau tien cua The Nhat</h1>
-    <p>Thuc hanh phat trien phan mem ma nguon mo</p>
+
+    <div class="container">
+        <!-- Header Profile -->
+        <header class="profile-card">
+            <div class="avatar-box">
+                <div class="avatar">TN</div>
+                <div class="online-status" title="Đã sẵn sàng đồng bộ Git"></div>
+            </div>
+            <div class="user-info">
+                <h1>Nguyễn Thế Nhật</h1>
+                <p>Thực hành Phát triển Phần mềm Mã nguồn mở & Quản lý Mã nguồn Git / GitHub</p>
+                <div class="badges">
+                    <span class="badge">🚀 GitHub: <strong>thenhat7789-pixel</strong></span>
+                    <span class="badge">💻 Workspace: <strong>oss-practice</strong></span>
+                    <span class="badge">🌐 OS: <strong>Windows & Ubuntu 24.04</strong></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Interactive Git Workflow Guide -->
+        <section>
+            <h2 class="section-title">⚡ Mô phỏng quy trình đẩy Code lên GitHub</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.25rem;">Nhấn vào từng bước dưới đây để xem câu lệnh và kết quả tương ứng trong Terminal:</p>
+            
+            <div class="card-grid">
+                <div class="cmd-card active" onclick="selectStep(1, 'git pull origin main', 'Already up to date.\nCập nhật dữ liệu mới nhất từ GitHub về máy thành công!')">
+                    <div class="cmd-step">Bước 1</div>
+                    <div class="cmd-name">git pull</div>
+                    <div class="cmd-desc">Kéo code mới nhất từ GitHub về trước khi sửa</div>
+                </div>
+
+                <div class="cmd-card" onclick="selectStep(2, 'git add .', 'Staged 2 modified files: index.html, README.md\nĐã đưa các file vừa sửa vào hàng chờ!')">
+                    <div class="cmd-step">Bước 2</div>
+                    <div class="cmd-name">git add .</div>
+                    <div class="cmd-desc">Đưa tất cả các thay đổi vào hàng chờ (Staging)</div>
+                </div>
+
+                <div class="cmd-card" onclick="selectStep(3, 'git commit -m &quot;Cap nhat giao dien va bai tap moi&quot;', '[main 4a7b9c1] Cap nhat giao dien va bai tap moi\n 2 files changed, 150 insertions(+)\nĐã lưu bản snapshot cục bộ!')">
+                    <div class="cmd-step">Bước 3</div>
+                    <div class="cmd-name">git commit</div>
+                    <div class="cmd-desc">Tạo commit kèm dòng mô tả công việc</div>
+                </div>
+
+                <div class="cmd-card" onclick="selectStep(4, 'git push origin main', 'Enumerating objects: 5, done.\nWriting objects: 100% (5/5), done.\nTo https://github.com/thenhat7789-pixel/oss-practice.git\n   main -> main\n🎉 Đã đẩy thành công lên GitHub!')">
+                    <div class="cmd-step">Bước 4</div>
+                    <div class="cmd-name">git push</div>
+                    <div class="cmd-desc">Tải các thay đổi từ máy local lên GitHub</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Terminal Simulation -->
+        <section class="terminal-box">
+            <div class="terminal-header">
+                <div class="dots">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="terminal-title">bash - Terminal Simulator</div>
+                <button class="btn-action" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; margin: 0;" onclick="copyCmd()">Sao chép lệnh</button>
+            </div>
+            <div class="terminal-body" id="terminalOutput">
+                <span class="prompt">thenhat@windows:~/oss-practice$</span> <span class="cmd-text" id="cmdDisplay">git pull origin main</span>
+                <div class="output-text" id="outputDisplay">Already up to date.
+Cập nhật dữ liệu mới nhất từ GitHub về máy thành công!</div>
+            </div>
+        </section>
+
+        <!-- Interactive Quick Quiz -->
+        <section class="quiz-section">
+            <h2 class="section-title">❓ Câu hỏi ôn tập nhanh</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Lệnh nào dùng để kiểm tra danh sách các tệp tin đã chỉnh sửa nhưng chưa commit?</p>
+            
+            <div class="quiz-option" onclick="checkAnswer(this, false)">
+                <span>A.</span> <code>git log</code>
+            </div>
+            <div class="quiz-option" onclick="checkAnswer(this, true)">
+                <span>B.</span> <code>git status</code>
+            </div>
+            <div class="quiz-option" onclick="checkAnswer(this, false)">
+                <span>C.</span> <code>git checkout</code>
+            </div>
+            <div class="quiz-option" onclick="checkAnswer(this, false)">
+                <span>D.</span> <code>git remote -v</code>
+            </div>
+            
+            <div id="quizFeedback" style="margin-top: 1rem; font-weight: 500;"></div>
+        </section>
+
+        <footer>
+            <p>© 2026 Nguyễn Thế Nhật • Thực hành Open Source Software • Visual Studio Code & Git Workflow</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentCmd = 'git pull origin main';
+
+        function selectStep(stepIndex, cmd, output) {
+            // Update active card styling
+            const cards = document.querySelectorAll('.cmd-card');
+            cards.forEach((card, idx) => {
+                if (idx === stepIndex - 1) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            // Update terminal text
+            currentCmd = cmd;
+            document.getElementById('cmdDisplay').innerText = cmd;
+            document.getElementById('outputDisplay').innerText = output;
+        }
+
+        function copyCmd() {
+            navigator.clipboard.writeText(currentCmd);
+            alert('Đã sao chép câu lệnh: ' + currentCmd);
+        }
+
+        function checkAnswer(element, isCorrect) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.classList.remove('correct', 'wrong'));
+
+            const feedback = document.getElementById('quizFeedback');
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.style.color = '#10b981';
+                feedback.innerText = '✅ Chính xác! "git status" hiển thị trạng thái hiện tại của các file trong dự án.';
+            } else {
+                element.classList.add('wrong');
+                feedback.style.color = '#ef4444';
+                feedback.innerText = '❌ Chưa chính xác. Thử lại nào!';
+            }
+        }
+    </script>
 </body>
 </html>
